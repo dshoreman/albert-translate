@@ -10,6 +10,13 @@ __trigger__ = "tr "
 __dependencies__ = []
 
 def handleQuery(query):
+    if not query.isTriggered:
+        return Item(
+            id=__prettyname__,
+            text=__prettyname__,
+            subtext="Usage: `tr [string to translate]`"
+        )
+
     return Item(
         id=__prettyname__,
         text=__prettyname__,
