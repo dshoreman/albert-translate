@@ -17,9 +17,11 @@ def handleQuery(query):
             subtext="Usage: `tr [string to translate]`"
         )
 
+    str = query.string or "translate"
+
     return Item(
         id=__prettyname__,
         text=__prettyname__,
-        subtext="Hello, translate!",
+        subtext="Hello, {:s}!".format(str),
         completion=query.rawString
     )
