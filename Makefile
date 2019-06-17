@@ -5,6 +5,9 @@ INSTALL_PATH = $(DESTDIR)$(PREFIX)/share/albert/org.albert.extension.python/modu
 all:
 	@echo "Run make install to install this Albert extension."
 
+clean:
+	@rm -rf "$(INSTALL_PATH)/translate"
+
 install:
 	@mkdir -p "$(INSTALL_PATH)/translate"
 	@cp -v translate.py "$(INSTALL_PATH)/translate/__init__.py"
