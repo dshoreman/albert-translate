@@ -3,6 +3,8 @@
 import os
 import configparser
 from albertv0 import *
+from google.api_core.exceptions import *
+from google.cloud import translate_v3beta1 as translate
 
 __iid__ = "PythonInterface/v0.2"
 __author__ = "Dave Shoreman"
@@ -15,6 +17,7 @@ confPath = os.path.join(configLocation(), "translate.ini")
 iconPath = os.path.dirname(__file__) + "/icon.png"
 config = configparser.ConfigParser()
 project_id = ""
+client = None
 
 def initialize():
     config.read(confPath)
@@ -27,8 +30,12 @@ def initialize():
         with open(confPath, 'w') as configFile:
             config.write(configFile)
 
-    global project_id
+    global client, parent, project_id
     project_id = config.get('api', 'project_id')
+
+    if project_id != "":
+        client = translate.TranslationServiceClient()
+        parent = client.location_path(project_id, 'global')
 
 def handleQuery(query):
     if not query.isTriggered:
@@ -48,11 +55,38 @@ def handleQuery(query):
         )
 
     str = query.string or "translate"
+    text=__prettyname__
+
+    try:
+        response = client.translate_text(
+            parent=parent,
+            contents=[str],
+            mime_type='text/plain',
+            target_language_code='en-GB'
+        )
+
+        translation = response.translations[0]
+        subtext = translation.translated_text
+        text = "Translated from {}".format(
+            translation.detected_language_code
+        )
+    except GoogleAPICallError as err:
+        subtext = "Translation failed ({}) ".format(err.message)
+        warning("GoogleAPICallError")
+        print(err)
+    except RetryError as err:
+        subtext = "Translation failed"
+        warning("RetryError")
+        print(err)
+    except ValueError as err:
+        subtext = "Translation failed"
+        warning("Got ValueError: " + err)
+        print(err)
 
     return Item(
         id=__prettyname__,
         icon=iconPath,
-        text=__prettyname__,
-        subtext="Hello, {:s}!".format(str),
+        text=text or __prettyname__,
+        subtext=subtext,
         completion=query.rawString
     )
