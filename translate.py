@@ -38,7 +38,7 @@ def initialize():
         parent = client.location_path(project_id, 'global')
 
 def handleQuery(query):
-    if not query.isTriggered:
+    if not query.isTriggered or query.string.strip() == "":
         return Item(
             id=__prettyname__,
             icon=iconPath,
