@@ -9,7 +9,7 @@ from google.cloud import translate_v3beta1 as translate
 __iid__ = "PythonInterface/v0.2"
 __author__ = "Dave Shoreman"
 __prettyname__ = "Translate"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __trigger__ = "tr "
 __dependencies__ = []
 
