@@ -47,8 +47,9 @@ def handleQuery(query):
     if not project_id:
         return makeItem(query, subtext="Missing or invalid config in " + confPath)
 
-    if "to:" in str.split(' ', 1)[0]:
-        arg, str = str.split(' ', 1)
+    strParts = str.split(' ', 1)
+    if "to:" in strParts[0] and len(strParts) > 1:
+        arg, str = strParts
         lang_to = arg.split(':')[1].strip()
 
     try:
