@@ -9,7 +9,7 @@ from google.cloud import translate_v3beta1 as translate
 __iid__ = "PythonInterface/v0.2"
 __author__ = "Dave Shoreman"
 __prettyname__ = "Translate"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __trigger__ = "tr "
 __dependencies__ = []
 
@@ -38,38 +38,36 @@ def initialize():
         parent = client.location_path(project_id, 'global')
 
 def handleQuery(query):
-    if not query.isTriggered or query.string.strip() == "":
-        return Item(
-            id=__prettyname__,
-            icon=iconPath,
-            text=__prettyname__,
-            subtext="Usage: `tr [string to translate]`"
-        )
+    str = query.string.strip()
+    lang_to = 'en'
+
+    if not query.isTriggered or str == "":
+        return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
     if not project_id:
-        return Item(
-            id=__prettyname__,
-            icon=iconPath,
-            text=__prettyname__,
-            subtext="Missing or invalid config in " + confPath
-        )
+        return makeItem(query, subtext="Missing or invalid config in " + confPath)
 
-    str = query.string or "translate"
-    text=__prettyname__
+    strParts = str.split(' ', 1)
+    if "to:" in strParts[0] and len(strParts) > 1:
+        arg, str = strParts
+        lang_to = arg.split(':')[1].strip()
 
     try:
         response = client.translate_text(
             parent=parent,
             contents=[str],
             mime_type='text/plain',
-            target_language_code='en-GB'
+            target_language_code=lang_to
         )
 
         translation = response.translations[0]
-        subtext = translation.translated_text
-        text = "Translated from {}".format(
-            translation.detected_language_code
+
+        item = makeItem(
+            query, translation.translated_text,
+            "Translated to {} from {}".format(lang_to, translation.detected_language_code)
         )
+        item.addAction(ClipAction("Copy to clipboard", item.text))
+        return item
     except GoogleAPICallError as err:
         subtext = "Translation failed ({}) ".format(err.message)
         warning("GoogleAPICallError")
@@ -83,10 +81,13 @@ def handleQuery(query):
         warning("Got ValueError: " + err)
         print(err)
 
+    return makeItem(query, subtext=subtext)
+
+def makeItem(query=None, text=__prettyname__, subtext=""):
     return Item(
         id=__prettyname__,
         icon=iconPath,
-        text=text or __prettyname__,
+        text=text,
         subtext=subtext,
         completion=query.rawString
     )
