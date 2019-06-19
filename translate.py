@@ -61,10 +61,12 @@ def handleQuery(query):
 
         translation = response.translations[0]
 
-        return makeItem(
+        item = makeItem(
             query, translation.translated_text,
             "Translated to {} from {}".format(lang_to, translation.detected_language_code)
         )
+        item.addAction(ClipAction("Copy to clipboard", item.text))
+        return item
     except GoogleAPICallError as err:
         subtext = "Translation failed ({}) ".format(err.message)
         warning("GoogleAPICallError")

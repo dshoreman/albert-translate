@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 * Ability to set target language for translation
+* Support for copying translated text to clipboard
 
 ### Changed
 * Translated text is now used as primary text instead of subtext
