@@ -39,24 +39,13 @@ def initialize():
 
 def handleQuery(query):
     str = query.string.strip()
-    text=__prettyname__
     lang_to = 'en'
 
     if not query.isTriggered or str == "":
-        return Item(
-            id=__prettyname__,
-            icon=iconPath,
-            text=text,
-            subtext="Usage: `tr [string to translate]`"
-        )
+        return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
     if not project_id:
-        return Item(
-            id=__prettyname__,
-            icon=iconPath,
-            text=text,
-            subtext="Missing or invalid config in " + confPath
-        )
+        return makeItem(query, subtext="Missing or invalid config in " + confPath)
 
     if "to:" in str.split(' ', 1)[0]:
         arg, str = str.split(' ', 1)
@@ -71,10 +60,10 @@ def handleQuery(query):
         )
 
         translation = response.translations[0]
-        text = translation.translated_text
-        subtext = "Translated to {} from {}".format(
-            lang_to,
-            translation.detected_language_code
+
+        return makeItem(
+            query, translation.translated_text,
+            "Translated to {} from {}".format(lang_to, translation.detected_language_code)
         )
     except GoogleAPICallError as err:
         subtext = "Translation failed ({}) ".format(err.message)
@@ -89,6 +78,9 @@ def handleQuery(query):
         warning("Got ValueError: " + err)
         print(err)
 
+    return makeItem(query, subtext=subtext)
+
+def makeItem(query=None, text=__prettyname__, subtext=""):
     return Item(
         id=__prettyname__,
         icon=iconPath,
