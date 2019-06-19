@@ -38,11 +38,14 @@ def initialize():
         parent = client.location_path(project_id, 'global')
 
 def handleQuery(query):
-    if not query.isTriggered or query.string.strip() == "":
+    str = query.string.strip()
+    text=__prettyname__
+
+    if not query.isTriggered or str == "":
         return Item(
             id=__prettyname__,
             icon=iconPath,
-            text=__prettyname__,
+            text=text,
             subtext="Usage: `tr [string to translate]`"
         )
 
@@ -53,9 +56,6 @@ def handleQuery(query):
             text=__prettyname__,
             subtext="Missing or invalid config in " + confPath
         )
-
-    str = query.string or "translate"
-    text=__prettyname__
 
     try:
         response = client.translate_text(
