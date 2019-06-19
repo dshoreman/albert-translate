@@ -40,6 +40,7 @@ def initialize():
 def handleQuery(query):
     str = query.string.strip()
     text=__prettyname__
+    lang_to = 'en'
 
     if not query.isTriggered or str == "":
         return Item(
@@ -57,12 +58,16 @@ def handleQuery(query):
             subtext="Missing or invalid config in " + confPath
         )
 
+    if "to:" in str.split(' ', 1)[0]:
+        arg, str = str.split(' ', 1)
+        lang_to = arg.split(':')[1].strip()
+
     try:
         response = client.translate_text(
             parent=parent,
             contents=[str],
             mime_type='text/plain',
-            target_language_code='en-GB'
+            target_language_code=lang_to
         )
 
         translation = response.translations[0]

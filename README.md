@@ -10,6 +10,13 @@ Once installed and enabled, Translate can be used with the `tr` trigger followed
 text you wish to translate. The source language will be automatically detected by the API, with the
 English translation then returned and displayed in Albert.
 
+#### Translating to Other Languages
+
+It is possible to translate into languages other than English by manually specifying the language code you
+wish to translate into with `to:<language-code>`, e.g. `tr to:fr Hello, world!` to translate into French.
+
+For a list of supported language codes, see [Language Support] in Google Cloud Docs.
+
 ### Installation
 
 In order to interact with the Google Cloud APIs, you first need to install the client:
@@ -61,3 +68,5 @@ Account in order to use it. You can create this at https://console.cloud.google.
    # [other startup applications snipped]
    ```
 5. Finally, add your Project ID to `~/.config/albert/tranlate.ini` and restart Albert
+
+[Language Support]: https://cloud.google.com/translate/docs/languages
