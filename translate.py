@@ -72,7 +72,8 @@ def handleQuery(query):
 
         translation = response.translations[0]
         text = translation.translated_text
-        subtext = "Translated from {}".format(
+        subtext = "Translated to {} from {}".format(
+            lang_to,
             translation.detected_language_code
         )
     except GoogleAPICallError as err:
