@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * Ability to set target language for translation
 
+### Changed
+* Translated text is now used as primary text instead of subtext
+
 
 ## [0.1.0] - 2019-06-18
 ### Added

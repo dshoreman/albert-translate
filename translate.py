@@ -54,7 +54,7 @@ def handleQuery(query):
         return Item(
             id=__prettyname__,
             icon=iconPath,
-            text=__prettyname__,
+            text=text,
             subtext="Missing or invalid config in " + confPath
         )
 
@@ -71,8 +71,8 @@ def handleQuery(query):
         )
 
         translation = response.translations[0]
-        subtext = translation.translated_text
-        text = "Translated from {}".format(
+        text = translation.translated_text
+        subtext = "Translated from {}".format(
             translation.detected_language_code
         )
     except GoogleAPICallError as err:
@@ -91,7 +91,7 @@ def handleQuery(query):
     return Item(
         id=__prettyname__,
         icon=iconPath,
-        text=text or __prettyname__,
+        text=text,
         subtext=subtext,
         completion=query.rawString
     )
