@@ -49,7 +49,9 @@ def handleQuery(query):
         return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
     if not project_id:
-        return makeItem(query, subtext="Missing or invalid config in " + confPath)
+        item = makeItem(query, "Missing or invalid config", "Press enter to open it in your editor")
+        item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
+        return item
 
     strParts = str.split(' ', 1)
     if "to:" in strParts[0] and len(strParts) > 1:
