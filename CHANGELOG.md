@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 * Ability to open config in editor if config is missing
+* New config section for setting default target language
 
 ### Changed
 * Subtext now displays language names instead of codes

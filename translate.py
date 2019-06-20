@@ -30,6 +30,7 @@ def initialize():
         critical("Translation requires Project ID to be set in " + confPath)
 
         config['api'] = {'project_id': ''}
+        config['extension'] = {'target_lang': 'en'}
 
         with open(confPath, 'w') as configFile:
             config.write(configFile)
@@ -41,9 +42,18 @@ def initialize():
         client = translate.TranslationServiceClient()
         parent = client.location_path(project_id, 'global')
 
+    if not config.has_section('extension'):
+        info("Adding extension section to config")
+        config.add_section('extension')
+
+    if not config.has_option('lang', 'target_lang'):
+        info("Setting config.lang.target_lang")
+        config['extension']['target_lang'] = "en"
+        with open(confPath, 'w') as configFile:
+            config.write(configFile)
+
 def handleQuery(query):
     str = query.string.strip()
-    lang_to = 'en'
 
     if not query.isTriggered or str == "":
         return makeItem(query, subtext="Usage: `tr [string to translate]`")
@@ -54,6 +64,7 @@ def handleQuery(query):
         return item
 
     strParts = str.split(' ', 1)
+    lang_to = config.get('extension', 'target_lang')
     if "to:" in strParts[0] and len(strParts) > 1:
         arg, str = strParts
         lang_to = arg.split(':')[1].strip()
