@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Changed
+* Subtext now displays language names instead of codes
 
 
 ## [0.2.0] - 2019-06-19

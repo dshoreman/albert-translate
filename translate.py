@@ -4,6 +4,7 @@ auto-detecting the source language with the Cloud Translate API.
 Usage: tr [to:<lang-code>] <text to translate>"""
 
 import os
+import json
 import configparser
 from albertv0 import *
 from google.api_core.exceptions import *
@@ -67,7 +68,10 @@ def handleQuery(query):
 
         item = makeItem(
             query, translation.translated_text,
-            "Translated to {} from {}".format(lang_to, translation.detected_language_code)
+            "Translated to {} from {}".format(
+                lang.toName(lang_to),
+                lang.toName(translation.detected_language_code)
+            )
         )
         item.addAction(ClipAction("Copy to clipboard", item.text))
         return item
@@ -94,3 +98,21 @@ def makeItem(query=None, text=__prettyname__, subtext=""):
         subtext=subtext,
         completion=query.rawString
     )
+
+class Lang:
+    langPath = os.path.dirname(__file__) + "/languages.json"
+    languages = dict()
+
+    def __init__(self):
+        if os.path.exists(self.langPath):
+            debug("Loading support languages from " + self.langPath)
+            with open(self.langPath) as langJson:
+                self.languages = json.load(langJson)
+
+    def toCode(self, name):
+        return self.languages.keys()[languages.values().index(name)]
+
+    def toName(self, code):
+        return self.languages.get(code)
+
+lang = Lang()
