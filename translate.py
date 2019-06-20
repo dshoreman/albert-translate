@@ -53,15 +53,17 @@ def initialize():
             config.write(configFile)
 
 def handleQuery(query):
-    str = query.string.strip()
-
-    if not query.isTriggered or str == "":
-        return makeItem(query, subtext="Usage: `tr [string to translate]`")
+    if not query.isTriggered:
+        return
 
     if not project_id:
         item = makeItem(query, "Missing or invalid config", "Press enter to open it in your editor")
         item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
         return item
+
+    str = query.string.strip()
+    if str == "":
+        return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
     strParts = str.split(' ', 1)
     lang_to = config.get('extension', 'target_lang')
