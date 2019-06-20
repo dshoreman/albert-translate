@@ -9,6 +9,7 @@ import configparser
 from albertv0 import *
 from google.api_core.exceptions import *
 from google.cloud import translate_v3beta1 as translate
+from urllib.parse import quote as quote_url
 
 __iid__ = "PythonInterface/v0.2"
 __author__ = "Dave Shoreman"
@@ -89,6 +90,10 @@ def handleQuery(query):
             )
         )
         item.addAction(ClipAction("Copy to clipboard", item.text))
+        item.addAction(UrlAction(
+            "View in Google Translate",
+            "https://translate.google.com/#auto/{}/{}".format(lang_to, quote_url(str, safe=''))
+        ))
         return item
     except GoogleAPICallError as err:
         subtext = "Translation failed ({}) ".format(err.message)
