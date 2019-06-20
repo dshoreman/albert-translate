@@ -1,15 +1,20 @@
-"""Translates a string to English."""
+"""Translates a string to English or a specified language,
+auto-detecting the source language with the Cloud Translate API.
+
+Usage: tr [to:<lang-code>] <text to translate>"""
 
 import os
+import json
 import configparser
 from albertv0 import *
 from google.api_core.exceptions import *
 from google.cloud import translate_v3beta1 as translate
+from urllib.parse import quote as quote_url
 
 __iid__ = "PythonInterface/v0.2"
 __author__ = "Dave Shoreman"
 __prettyname__ = "Translate"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __trigger__ = "tr "
 __dependencies__ = []
 
@@ -26,6 +31,7 @@ def initialize():
         critical("Translation requires Project ID to be set in " + confPath)
 
         config['api'] = {'project_id': ''}
+        config['extension'] = {'target_lang': 'en'}
 
         with open(confPath, 'w') as configFile:
             config.write(configFile)
@@ -37,17 +43,31 @@ def initialize():
         client = translate.TranslationServiceClient()
         parent = client.location_path(project_id, 'global')
 
-def handleQuery(query):
-    str = query.string.strip()
-    lang_to = 'en'
+    if not config.has_section('extension'):
+        info("Adding extension section to config")
+        config.add_section('extension')
 
-    if not query.isTriggered or str == "":
-        return makeItem(query, subtext="Usage: `tr [string to translate]`")
+    if not config.has_option('extension', 'target_lang'):
+        info("Setting config.extension.target_lang")
+        config['extension']['target_lang'] = "en"
+        with open(confPath, 'w') as configFile:
+            config.write(configFile)
+
+def handleQuery(query):
+    if not query.isTriggered:
+        return
 
     if not project_id:
-        return makeItem(query, subtext="Missing or invalid config in " + confPath)
+        item = makeItem(query, "Missing or invalid config", "Press enter to open it in your editor")
+        item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
+        return item
+
+    str = query.string.strip()
+    if str == "":
+        return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
     strParts = str.split(' ', 1)
+    lang_to = config.get('extension', 'target_lang')
     if "to:" in strParts[0] and len(strParts) > 1:
         arg, str = strParts
         lang_to = arg.split(':')[1].strip()
@@ -64,9 +84,16 @@ def handleQuery(query):
 
         item = makeItem(
             query, translation.translated_text,
-            "Translated to {} from {}".format(lang_to, translation.detected_language_code)
+            "Translated to {} from {}".format(
+                lang.toName(lang_to),
+                lang.toName(translation.detected_language_code)
+            )
         )
         item.addAction(ClipAction("Copy to clipboard", item.text))
+        item.addAction(UrlAction(
+            "View in Google Translate",
+            "https://translate.google.com/#auto/{}/{}".format(lang_to, quote_url(str, safe=''))
+        ))
         return item
     except GoogleAPICallError as err:
         subtext = "Translation failed ({}) ".format(err.message)
@@ -91,3 +118,21 @@ def makeItem(query=None, text=__prettyname__, subtext=""):
         subtext=subtext,
         completion=query.rawString
     )
+
+class Lang:
+    langPath = os.path.dirname(__file__) + "/languages.json"
+    languages = dict()
+
+    def __init__(self):
+        if os.path.exists(self.langPath):
+            debug("Loading support languages from " + self.langPath)
+            with open(self.langPath) as langJson:
+                self.languages = json.load(langJson)
+
+    def toCode(self, name):
+        return self.languages.keys()[languages.values().index(name)]
+
+    def toName(self, code):
+        return self.languages.get(code)
+
+lang = Lang()
