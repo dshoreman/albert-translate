@@ -46,8 +46,8 @@ def initialize():
         info("Adding extension section to config")
         config.add_section('extension')
 
-    if not config.has_option('lang', 'target_lang'):
-        info("Setting config.lang.target_lang")
+    if not config.has_option('extension', 'target_lang'):
+        info("Setting config.extension.target_lang")
         config['extension']['target_lang'] = "en"
         with open(confPath, 'w') as configFile:
             config.write(configFile)
