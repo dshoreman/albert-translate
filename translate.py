@@ -39,8 +39,20 @@ def initialize():
     global client, parent, project_id
     project_id = config.get('api', 'project_id')
 
+    keyfile = None
+    if config.has_option('api', 'service_key'):
+        keyfile = os.path.expanduser(config.get('api', 'service_key'))
+
+        if not os.path.exists(keyfile):
+            warning("Could not find service key JSON at " + keyfile)
+            keyfile = None
+
     if project_id != "":
-        client = translate.TranslationServiceClient()
+        if keyfile is not None:
+            client = translate.TranslationServiceClient.from_service_account_file(keyfile)
+        else:
+            client = translate.TranslationServiceClient()
+
         parent = client.location_path(project_id, 'global')
 
     if not config.has_section('extension'):

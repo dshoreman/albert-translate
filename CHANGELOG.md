@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Added
+* Support for setting path to service key file in config
 
 
 ## [0.3.0] - 2019-06-20
