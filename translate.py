@@ -1,4 +1,7 @@
-"""Translates a string to English."""
+"""Translates a string to English or a specified language,
+auto-detecting the source language with the Cloud Translate API.
+
+Usage: tr [to:<lang-code>] <text to translate>"""
 
 import os
 import configparser
