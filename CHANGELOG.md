@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * Support for setting path to service key file in config
 
+### Fixed
+* Now fails gracefully is path to key JSON is missing or invalid
+
 
 ## [0.3.0] - 2019-06-20
 ### Added

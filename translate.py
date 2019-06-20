@@ -48,12 +48,15 @@ def initialize():
             keyfile = None
 
     if project_id != "":
-        if keyfile is not None:
-            client = translate.TranslationServiceClient.from_service_account_file(keyfile)
-        else:
-            client = translate.TranslationServiceClient()
+        try:
+            if keyfile is not None:
+                client = translate.TranslationServiceClient.from_service_account_file(keyfile)
+            else:
+                client = translate.TranslationServiceClient()
 
-        parent = client.location_path(project_id, 'global')
+            parent = client.location_path(project_id, 'global')
+        except Exception as err:
+            critical(err)
 
     if not config.has_section('extension'):
         info("Adding extension section to config")
@@ -71,6 +74,11 @@ def handleQuery(query):
 
     if not project_id:
         item = makeItem(query, "Missing or invalid config", "Press enter to open it in your editor")
+        item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
+        return item
+
+    if client is None:
+        item = makeItem(query, "Failed to load API client", "Did you set your service key path?")
         item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
         return item
 
