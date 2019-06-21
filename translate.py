@@ -92,7 +92,13 @@ def handleQuery(query):
         arg, str = strParts
         lang_to = arg.split(':')[1].strip()
 
-    return translate(str, lang_to, query)
+    items = []
+    for lang in lang_to.split(','):
+        if lang.strip() == "":
+            continue
+        items.append(translate(str, lang, query))
+
+    return items
 
 def translate(str, target, query):
     try:
