@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Support for setting path to service key file in config
 * Ability to translate into multiple comma-separated languages
 
+### Changed
+* Invalid language codes are no longer left for the API to catch
+
 ### Fixed
 * Now fails gracefully if path to key JSON is missing or invalid
 

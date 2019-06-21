@@ -93,10 +93,18 @@ def handleQuery(query):
         lang_to = arg.split(':')[1].strip()
 
     items = []
-    for lang in lang_to.split(','):
-        if lang.strip() == "":
+    for target in lang_to.split(','):
+        if target.strip() == "":
             continue
-        items.append(translate(str, lang, query))
+
+        if lang.has(target):
+            item = translate(str, target, query)
+        else:
+            item = makeItem(query, "Translation failed",
+                            "{} is not a valid language.".format(target.upper()))
+            item.addAction(UrlAction("Open list of support languages",
+                                     "https://cloud.google.com/translate/docs/languages"))
+        items.append(item)
 
     return items
 
@@ -157,6 +165,9 @@ class Lang:
             debug("Loading support languages from " + self.langPath)
             with open(self.langPath) as langJson:
                 self.languages = json.load(langJson)
+
+    def has(self, code):
+        return code in self.languages
 
     def toCode(self, name):
         return self.languages.keys()[languages.values().index(name)]
