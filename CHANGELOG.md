@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * Support for setting path to service key file in config
 * Ability to translate into multiple comma-separated languages
+* Ability to set source language with `from:<code>`
 
 ### Changed
 * Invalid language codes are no longer left for the API to catch

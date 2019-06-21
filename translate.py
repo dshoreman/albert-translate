@@ -82,23 +82,17 @@ def handleQuery(query):
         item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
         return item
 
-    str = query.string.strip()
+    str, source, targets = parseArgs(query.string.strip())
     if str == "":
         return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
-    strParts = str.split(' ', 1)
-    lang_to = config.get('extension', 'target_lang')
-    if "to:" in strParts[0] and len(strParts) > 1:
-        arg, str = strParts
-        lang_to = arg.split(':')[1].strip()
-
     items = []
-    for target in lang_to.split(','):
+    for target in targets.split(','):
         if target.strip() == "":
             continue
 
         if lang.has(target):
-            item = translate(str, target, query)
+            item = translate(str, source, target, query)
         else:
             item = makeItem(query, "Translation failed",
                             "{} is not a valid language.".format(target.upper()))
@@ -108,16 +102,43 @@ def handleQuery(query):
 
     return items
 
-def translate(str, target, query):
+def parseArgs(str):
+    source = ""
+    target = config.get('extension', 'target_lang')
+
+    for i, current in enumerate(str.split(' ')):
+        if i > 1 or ":" not in current:
+            break
+
+        arg, value = current.split(':')
+        if value == "":
+            continue
+
+        if arg == "from":
+            str = ' '.join(str.split(' ')[1:])
+            source = value
+        elif arg == "to":
+            str = ' '.join(str.split(' ')[1:])
+            target = value
+
+    if source == "":
+        source = "auto"
+
+    return str, source, target
+
+def translate(str, source, target, query):
     try:
-        return responseToItem(
-            client.translate_text(
-                parent=parent,
-                contents=[str],
-                mime_type='text/plain',
-                target_language_code=target
-            ), str, target, query
-        )
+        params = {
+            'parent': parent,
+            'contents': [str],
+            'mime_type': 'text/plain',
+            'target_language_code': target
+        }
+        if source != "auto":
+            params['source_language_code'] = source
+
+        return responseToItem(client.translate_text(**params),
+                              str, source, target, query)
     except GoogleAPICallError as err:
         errmsg = "Translation failed: {}".format(err.message)
         warning(err)
@@ -130,20 +151,20 @@ def translate(str, target, query):
 
     return makeItem(query, subtext=errmsg)
 
-def responseToItem(response, str, target, query):
+def responseToItem(response, str, source, target, query):
     translation = response.translations[0]
 
     item = makeItem(
         query, translation.translated_text,
         "Translated to {} from {}".format(
             lang.toName(target),
-            lang.toName(translation.detected_language_code)
+            lang.toName(translation.detected_language_code if source == "auto" else source)
         )
     )
     item.addAction(ClipAction("Copy to clipboard", item.text))
     item.addAction(UrlAction(
         "View in Google Translate",
-        "https://translate.google.com/#auto/{}/{}".format(target, quote_url(str, safe=''))
+        "https://translate.google.com/#{}/{}/{}".format(source, target, quote_url(str, safe=''))
     ))
     return item
 
