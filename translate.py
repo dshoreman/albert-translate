@@ -86,6 +86,9 @@ def handleQuery(query):
     if str == "":
         return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
+    if not lang.has(source):
+        return badLanguageItem(query, source)
+
     items = []
     for target in targets.split(','):
         if target.strip() == "":
@@ -94,10 +97,7 @@ def handleQuery(query):
         if lang.has(target):
             item = translate(str, source, target, query)
         else:
-            item = makeItem(query, "Translation failed",
-                            "{} is not a valid language.".format(target.upper()))
-            item.addAction(UrlAction("Open list of support languages",
-                                     "https://cloud.google.com/translate/docs/languages"))
+            item = badLanguageItem(query, target)
         items.append(item)
 
     return items
@@ -166,6 +166,13 @@ def responseToItem(response, str, source, target, query):
         "View in Google Translate",
         "https://translate.google.com/#{}/{}/{}".format(source, target, quote_url(str, safe=''))
     ))
+    return item
+
+def badLanguageItem(query, lang):
+    item = makeItem(query, "Translation failed",
+                    "{} is not a valid language.".format(lang.upper()))
+    item.addAction(UrlAction("Open list of support languages",
+                             "https://cloud.google.com/translate/docs/languages"))
     return item
 
 def makeItem(query=None, text=__prettyname__, subtext=""):
