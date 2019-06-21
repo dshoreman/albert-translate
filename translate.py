@@ -8,7 +8,7 @@ import json
 import configparser
 from albertv0 import *
 from google.api_core.exceptions import *
-from google.cloud import translate_v3beta1 as translate
+from google.cloud import translate_v3beta1 as api
 from urllib.parse import quote as quote_url
 
 __iid__ = "PythonInterface/v0.2"
@@ -50,9 +50,9 @@ def initialize():
     if project_id != "":
         try:
             if keyfile is not None:
-                client = translate.TranslationServiceClient.from_service_account_file(keyfile)
+                client = api.TranslationServiceClient.from_service_account_file(keyfile)
             else:
-                client = translate.TranslationServiceClient()
+                client = api.TranslationServiceClient()
 
             parent = client.location_path(project_id, 'global')
         except Exception as err:
@@ -92,43 +92,46 @@ def handleQuery(query):
         arg, str = strParts
         lang_to = arg.split(':')[1].strip()
 
+    return translate(str, lang_to, query)
+
+def translate(str, target, query):
     try:
-        response = client.translate_text(
-            parent=parent,
-            contents=[str],
-            mime_type='text/plain',
-            target_language_code=lang_to
+        return responseToItem(
+            client.translate_text(
+                parent=parent,
+                contents=[str],
+                mime_type='text/plain',
+                target_language_code=target
+            ), str, target, query
         )
-
-        translation = response.translations[0]
-
-        item = makeItem(
-            query, translation.translated_text,
-            "Translated to {} from {}".format(
-                lang.toName(lang_to),
-                lang.toName(translation.detected_language_code)
-            )
-        )
-        item.addAction(ClipAction("Copy to clipboard", item.text))
-        item.addAction(UrlAction(
-            "View in Google Translate",
-            "https://translate.google.com/#auto/{}/{}".format(lang_to, quote_url(str, safe=''))
-        ))
-        return item
     except GoogleAPICallError as err:
-        subtext = "Translation failed ({}) ".format(err.message)
-        warning("GoogleAPICallError")
-        print(err)
+        errmsg = "Translation failed: {}".format(err.message)
+        warning(err)
     except RetryError as err:
-        subtext = "Translation failed"
-        warning("RetryError")
-        print(err)
+        errmsg = "Translation failed"
+        warning(err)
     except ValueError as err:
-        subtext = "Translation failed"
-        warning("Got ValueError: " + err)
-        print(err)
+        errmsg = "Translation failed"
+        warning(err)
 
-    return makeItem(query, subtext=subtext)
+    return makeItem(query, subtext=errmsg)
+
+def responseToItem(response, str, target, query):
+    translation = response.translations[0]
+
+    item = makeItem(
+        query, translation.translated_text,
+        "Translated to {} from {}".format(
+            lang.toName(target),
+            lang.toName(translation.detected_language_code)
+        )
+    )
+    item.addAction(ClipAction("Copy to clipboard", item.text))
+    item.addAction(UrlAction(
+        "View in Google Translate",
+        "https://translate.google.com/#auto/{}/{}".format(target, quote_url(str, safe=''))
+    ))
+    return item
 
 def makeItem(query=None, text=__prettyname__, subtext=""):
     return Item(
