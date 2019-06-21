@@ -25,19 +25,7 @@ project_id = ""
 client = None
 
 def initialize():
-    config.read(confPath)
-
-    if 'api' not in config or 'project_id' not in config['api']:
-        critical("Translation requires Project ID to be set in " + confPath)
-
-        config['api'] = {'project_id': ''}
-        config['extension'] = {'target_lang': 'en'}
-
-        with open(confPath, 'w') as configFile:
-            config.write(configFile)
-
-    global client, parent, project_id
-    project_id = config.get('api', 'project_id')
+    loadConfig()
 
     keyfile = None
     if config.has_option('api', 'service_key'):
@@ -47,7 +35,12 @@ def initialize():
             warning("Could not find service key JSON at " + keyfile)
             keyfile = None
 
-    if project_id != "":
+    global client, parent, project_id
+    project_id = config.get('api', 'project_id').strip()
+
+    if project_id == "":
+        critical("Translation requires Project ID to be set in " + confPath)
+    else:
         try:
             if keyfile is not None:
                 client = api.TranslationServiceClient.from_service_account_file(keyfile)
@@ -58,15 +51,31 @@ def initialize():
         except Exception as err:
             critical(err)
 
-    if not config.has_section('extension'):
-        info("Adding extension section to config")
-        config.add_section('extension')
+def loadConfig():
+    global writeConfig
+    writeConfig = False
+    config.read(confPath)
 
-    if not config.has_option('extension', 'target_lang'):
-        info("Setting config.extension.target_lang")
-        config['extension']['target_lang'] = "en"
+    addConfigOption('api', 'project_id')
+    addConfigOption('api', 'service_key')
+    addConfigOption('extension', 'source_lang', 'auto')
+    addConfigOption('extension', 'target_lang', 'en')
+
+    if writeConfig:
         with open(confPath, 'w') as configFile:
+            info("Writing config file to {}".format(confPath))
             config.write(configFile)
+
+def addConfigOption(section, option, value=''):
+    if not config.has_section(section):
+        config.add_section(section)
+
+    if config.has_option(section, option):
+        return
+
+    global writeConfig
+    config[section][option] = value
+    writeConfig = True
 
 def handleQuery(query):
     if not query.isTriggered:

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 * Invalid language codes are no longer left for the API to catch
+* Options are now added to config automatically with defaults where appropriate
 
 ### Fixed
 * Now fails gracefully if path to key JSON is missing or invalid
