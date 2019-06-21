@@ -103,7 +103,7 @@ def handleQuery(query):
     return items
 
 def parseArgs(str):
-    source = ""
+    source = config.get('extension', 'source_lang', fallback='auto')
     target = config.get('extension', 'target_lang')
 
     for i, current in enumerate(str.split(' ')):
