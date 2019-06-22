@@ -91,6 +91,7 @@ def handleQuery(query):
         item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
         return item
 
+    global targets
     str, source, targets = parseArgs(query.string.strip())
     if str == "":
         return makeItem(query, subtext="Usage: `tr [string to translate]`")
@@ -99,12 +100,15 @@ def handleQuery(query):
         return badLanguageItem(query, source)
 
     items = []
-    for target in targets.split(','):
-        if target.strip() == "":
+    targets = targets.split(',')
+    for target in targets:
+        if target.strip() == "" or len(targets) > 1 and source == target:
             continue
 
         if lang.has(target):
             item = translate(str, source, target, query)
+            if item is None:
+                continue
         else:
             item = badLanguageItem(query, target)
         items.append(item)
@@ -162,6 +166,8 @@ def translate(str, source, target, query):
 
 def responseToItem(response, str, source, target, query):
     translation = response.translations[0]
+    if source == "auto" and len(targets) > 1 and target == translation.detected_language_code:
+        return None
 
     item = makeItem(
         query, translation.translated_text,
