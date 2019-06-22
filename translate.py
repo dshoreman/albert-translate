@@ -95,7 +95,7 @@ def handleQuery(query):
     if str == "":
         return makeItem(query, subtext="Usage: `tr [string to translate]`")
 
-    if source is not "auto" and not lang.has(source):
+    if source != "auto" and not lang.has(source):
         return badLanguageItem(query, source)
 
     items = []
