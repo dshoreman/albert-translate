@@ -82,14 +82,10 @@ def handleQuery(query):
         return
 
     if not project_id:
-        item = makeItem(query, "Missing or invalid config", "Press enter to open it in your editor")
-        item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
-        return item
+        return badConfigItem(query, "Missing or invalid config", "Press enter to open it in your editor")
 
     if client is None:
-        item = makeItem(query, "Failed to load API client", "Did you set your service key path?")
-        item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
-        return item
+        return badConfigItem(query, "Failed to load API client", "Did you set your service key path?")
 
     global targets
     str, source, targets = parseArgs(query.string.strip())
@@ -181,6 +177,17 @@ def responseToItem(response, str, source, target, query):
         "View in Google Translate",
         "https://translate.google.com/#{}/{}/{}".format(source, target, quote_url(str, safe=''))
     ))
+    return item
+
+def badConfigItem(query, text, subtext):
+    item = makeItem(query, text, subtext)
+    item.addAction(ProcAction("Open extension config in your editor", ["xdg-open", confPath]))
+    item.addAction(UrlAction("View installation instructions",
+                             "https://github.com/dshoreman/albert-translate#installation"))
+    item.addAction(UrlAction("Create a Google Cloud Platform Project",
+                             "https://console.cloud.google.com/projectcreate"))
+    item.addAction(UrlAction("Create a Service Account Key",
+                             "https://console.cloud.google.com/apis/credentials/serviceaccountkey"))
     return item
 
 def badLanguageItem(query, lang):
