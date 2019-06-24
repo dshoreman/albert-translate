@@ -10,6 +10,5 @@ clean:
 
 install:
 	@mkdir -p "$(INSTALL_PATH)/translate"
-	@cp -v languages.json "$(INSTALL_PATH)/translate/"
-	@cp -v translate.py "$(INSTALL_PATH)/translate/__init__.py"
-	@cp -v icon-$(ICON).png "$(INSTALL_PATH)/translate/icon.png"
+	@cp -v icons/$(ICON).png "$(INSTALL_PATH)/translate/icon.png"
+	@cp -v src/* "$(INSTALL_PATH)/translate/"
