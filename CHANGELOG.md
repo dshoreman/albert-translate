@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [1.0.0] - 2019-06-24
+### Added
+* Support for setting path to service key file in config
+* Ability to translate into multiple comma-separated languages
+* Ability to set source language with `from:<code>`
+* Hiding of result when source is set to auto and translation matches the
+  detected language, as long as there are at least two target languages
+
+### Changed
+* Invalid language codes are no longer left for the API to catch
+* Options are now added to config automatically with defaults where appropriate
+
+### Fixed
+* Now fails gracefully if path to key JSON is missing or invalid
+
+
 ## [0.3.0] - 2019-06-20
 ### Added
 * Ability to open config in editor if config is missing
@@ -36,7 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Automatic translation of query into English
 
 
-[Unreleased]: https://github.com/dshoreman/albert-translate/compare/v0.3.0...develop
+[Unreleased]: https://github.com/dshoreman/albert-translate/compare/v1.0.0...develop
+[1.0.0]: https://github.com/dshoreman/albert-translate/releases/tag/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/dshoreman/albert-translate/releases/tag/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/dshoreman/albert-translate/releases/tag/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/dshoreman/albert-translate/releases/tag/v0.1.0
