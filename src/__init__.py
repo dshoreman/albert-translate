@@ -14,7 +14,7 @@ from urllib.parse import quote as quote_url
 __iid__ = "PythonInterface/v0.2"
 __author__ = "Dave Shoreman"
 __prettyname__ = "Translate"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __trigger__ = "tr "
 __dependencies__ = []
 
