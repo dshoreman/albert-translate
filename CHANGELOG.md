@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
+
+## [1.0.1] - 2019-09-15
 ### Fixed
 * Compare links in the changelog no longer 404
 
@@ -54,7 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Automatic translation of query into English
 
 
-[Unreleased]: https://github.com/dshoreman/albert-translate/compare/1.0.0...develop
+[Unreleased]: https://github.com/dshoreman/albert-translate/compare/1.0.1...develop
+[1.0.1]: https://github.com/dshoreman/albert-translate/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/dshoreman/albert-translate/compare/0.3.0...1.0.0
 [0.3.0]: https://github.com/dshoreman/albert-translate/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/dshoreman/albert-translate/compare/0.1.0...0.2.0
