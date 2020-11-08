@@ -8,7 +8,7 @@ import json
 import configparser
 from albertv0 import *
 from google.api_core.exceptions import *
-from google.cloud import translate_v3beta1 as api
+from google.cloud import translate_v3 as api
 from urllib.parse import quote as quote_url
 
 __iid__ = "PythonInterface/v0.2"
@@ -137,17 +137,14 @@ def parseArgs(str):
 
 def translate(str, source, target, query):
     try:
-        params = {
+        return responseToItem(client.translate_text(request = {
             'parent': parent,
             'contents': [str],
             'mime_type': 'text/plain',
+            'source_language_code':
+                source if source != "auto" else None,
             'target_language_code': target
-        }
-        if source != "auto":
-            params['source_language_code'] = source
-
-        return responseToItem(client.translate_text(**params),
-                              str, source, target, query)
+        }), str, source, target, query)
     except GoogleAPICallError as err:
         errmsg = "Translation failed: {}".format(err.message)
         warning(err)
