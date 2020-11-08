@@ -47,7 +47,7 @@ def initialize():
             else:
                 client = api.TranslationServiceClient()
 
-            parent = client.location_path(project_id, 'global')
+            parent = 'projects/{}/locations/global'.format(project_id)
         except Exception as err:
             critical(err)
 
