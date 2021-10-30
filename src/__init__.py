@@ -6,16 +6,16 @@ Usage: tr [to:<lang-code>] <text to translate>"""
 import os
 import json
 import configparser
-from albertv0 import *
+from albert import *
 from google.api_core.exceptions import *
 from google.cloud import translate_v3beta1 as api
 from urllib.parse import quote as quote_url
 
 __iid__ = "PythonInterface/v0.2"
-__author__ = "Dave Shoreman"
-__prettyname__ = "Translate"
-__version__ = "1.0.1"
-__trigger__ = "tr "
+__authors__ = "Dave Shoreman"
+__title__ = "Translate"
+__version__ = "0.0.1"
+__triggers__ = "tr "
 __dependencies__ = []
 
 confPath = os.path.join(configLocation(), "translate.ini")
@@ -197,9 +197,9 @@ def badLanguageItem(query, lang):
                              "https://cloud.google.com/translate/docs/languages"))
     return item
 
-def makeItem(query=None, text=__prettyname__, subtext=""):
+def makeItem(query=None, text=__title__, subtext=""):
     return Item(
-        id=__prettyname__,
+        id=__title__,
         icon=iconPath,
         text=text,
         subtext=subtext,
